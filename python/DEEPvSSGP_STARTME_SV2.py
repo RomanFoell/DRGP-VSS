@@ -1,5 +1,5 @@
-# In the most cases it is enough to train ones with fixed sn and sf (b, SIGMA_S were assumed to be always fixed)
-# and optional MU_S, U depending on the data-set with about 50 to 100 iterations
+# In the most cases it is enough to train ones with fixed sn and sf (b were assumed to be always fixed)
+# and optional S, U depending on the data-set with about 50 to 100 iterations
 
 owd = 'C:/Users/flo9fe/Desktop/GIT_DRGP_VSS/python'
 #owd = '/usr/local/home/foellrn/GIT_DRGP_VSS/python'
