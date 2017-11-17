@@ -12,21 +12,21 @@ Steps to go:
 1. - in \DRGP_VSS\matlab open the calibrate.m and change your prefered setting
    - choose create_data_python = 'on'; simulation = 'off'; to create the preprocessed data for python
    - Run STARTME.m
-   - the created file 'load_python.mat' was saved in \DRGP_VSS\python\data
+   - the created file 'load_python.mat' was saved in \DRGP-VSS\python\data
 2. - in \DRGP_VSS\python open 'DEEPvSSGP_STARTME_SV1.py' (DRGP-VVS) or 'DEEPvSSGP_STARTME_SV2.py' (DRGP-SS)
    - choose a specify filename to load (# specify filename to load --> load_python.mat or other)
    - if you have chosen non_rec = 'on' in matlab, specify non_rec = 1; in python, otherwise 0
    - choose the to optimize variables and iterations
    - Run 'DEEPvSSGP_STARTME_SV1.py' (DRGP-VVS) or 'DEEPvSSGP_STARTME_SV2.py' (DRGP-SS)
    - for the first time theano will compile the code
-   - the optimized file is saved in \DRGP_VSSmatlab\data_optimized
-3. - in \DRGP_VSS\matlab open the calibrate.m and choose the same setting as in 1. unless
+   - the optimized file is saved in \DRGP-VSS\matlab\data_optimized
+3. - in \DRGP-VSS\matlab open the calibrate.m and choose the same setting as in 1. but
      choose create_data_python = 'off'; simulation = 'on' and specify
      filename_optimized_parameters = '...';
    - Run STARTME.m and wait for the results
    
-We also offer some of our achieved results in \DRGP_VSS\matlab\data_optimized.
-The raw data is available in \DRGP_VSS\matlab\data_raw.
+We also offer some of our achieved results in \DRGP-VSS\matlab\data_optimized.
+The raw data is available in \DRGP-VSS\matlab\data_raw.
 
 Our code relies on some code snippets of VSSGP (https://github.com/yaringal/VSSGP).
 This means we took just these parts of the code which brings our new algorithm/method to work with theano/python.
