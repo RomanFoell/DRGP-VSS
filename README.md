@@ -1,4 +1,5 @@
 # DRGP-VSS
+# (licenced under MIT licence)
 
 The code is split into three parts:
 
