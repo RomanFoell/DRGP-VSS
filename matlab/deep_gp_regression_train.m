@@ -124,9 +124,27 @@ elseif strcmp(config.simulation,'on')
         opt_hyp.('output').phase = double(opt_params.b(:,i+1)');
     end%if
 
+    color_order = [0         0.4470    0.7410
+                   0.8500    0.3250    0.0980
+                   0.9290    0.6940    0.1250
+                   0.4940    0.1840    0.5560
+                   0.4660    0.6740    0.1880
+                   0.3010    0.7450    0.9330
+                   0.6350    0.0780    0.1840];
+    color_order_var = [127 164 189
+                       218 167 146
+                       238 215 160
+                       135 96  143
+                       147 172 115
+                       160 215 238
+                       164 110 119]/255;
     figure
     for l = 1:config.layers 
-        plot(1:size(opt_hyp.(strcat('layer',num2str(l))).mu,2),opt_hyp.(strcat('layer',num2str(l))).mu,'DisplayName',strcat('state',num2str(l)));
+        fill([1:size(opt_hyp.(strcat('layer',num2str(l))).sigma,2) fliplr(1:size(opt_hyp.(strcat('layer',num2str(l))).sigma,2))],[opt_hyp.(strcat('layer',num2str(l))).mu + 2*sqrt(log(1 + exp(opt_hyp.(strcat('layer',num2str(l))).sigma).^2)),fliplr(opt_hyp.(strcat('layer',num2str(l))).mu - 2*sqrt(log(1 + exp(opt_hyp.(strcat('layer',num2str(l))).sigma).^2)))],color_order_var(l,:),'edgecolor',color_order_var(l,:),'DisplayName','2 times SD');
+        hold on
+    end%for
+    for l = 1:config.layers 
+        plot(1:size(opt_hyp.(strcat('layer',num2str(l))).mu,2),opt_hyp.(strcat('layer',num2str(l))).mu,'DisplayName',strcat('state',num2str(l)),'color',color_order(l,:));
         hold on
     end%for
     title('hidden states')
