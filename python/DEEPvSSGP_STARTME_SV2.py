@@ -75,8 +75,8 @@ hyp[:,1] = lengthscale_p
 lower_bound_values = 0 # show lower bound value for every iteration, less fast
 save_iter = 0 # save opt_params every iteration (outcome in \DRGP_VSS\python\...)
 
-opt_params = {'hyp': hyp, 'MU': MU, 'SIGMA': SIGMA} # optimized parameters
-fixed_params = {'b': b, 'sn': sn, 'sf': sf, 'S': S, 'U': U} # other not optimized parameters
+opt_params = {'hyp': hyp, 'S': S, 'MU': MU, 'SIGMA': SIGMA} # optimized parameters
+fixed_params = {'b': b, 'sn': sn, 'sf': sf, 'U': U} # other not optimized parameters
 inputs = {'X': X, 'y': y} # input and output data
 DEEPvSSGP_opt1 = DEEPvSSGP_opt(Q, D, layers, order, D_cum_sum, N, M, non_rec, lower_bound_values, save_iter, inputs, opt_params, fixed_params)
 
