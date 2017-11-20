@@ -9,11 +9,11 @@ The code is split into three parts:
 
 Steps to go:
 
-1. - in \DRGP_VSS\matlab open the calibrate.m and change your prefered setting
+1. - in \DRGP-VSS\matlab open the calibrate.m and change your prefered setting
    - choose create_data_python = 'on'; simulation = 'off'; to create the preprocessed data for python
    - Run STARTME.m
    - the created file 'load_python.mat' was saved in \DRGP-VSS\python\data
-2. - in \DRGP_VSS\python open 'DEEPvSSGP_STARTME_SV1.py' (DRGP-VVS) or 'DEEPvSSGP_STARTME_SV2.py' (DRGP-SS)
+2. - in \DRGP-VSS\python open 'DEEPvSSGP_STARTME_SV1.py' (DRGP-VVS) or 'DEEPvSSGP_STARTME_SV2.py' (DRGP-SS)
    - choose a specify filename to load (# specify filename to load --> load_python.mat or other)
    - if you have chosen non_rec = 'on' in matlab, specify non_rec = 1; in python, otherwise 0
    - choose the to optimize variables and iterations
