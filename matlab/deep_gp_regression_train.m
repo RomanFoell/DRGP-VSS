@@ -155,7 +155,12 @@ elseif strcmp(config.simulation,'on')
     % not needed in loop
     k_config.nX = config.nX;
     k_config.mm = config.mm;
-    k_config.readed_kernels = config.readed_kernels;       
+    k_config.readed_kernels = config.readed_kernels;
+    if isfield(opt_params,'MEAN_MAP')
+        %
+    else
+        opt_params.MEAN_MAP = zeros(1,size(X,1));
+    end%
 
     % all layers
     config.loop = fieldnames(opt_hyp);
@@ -187,7 +192,7 @@ elseif strcmp(config.simulation,'on')
         inv_K_MN_NM = solve_chol(A_K_MN_NM_chol{i},eye(config.mm));
         if i < config.layers + 1
             MU = opt_hyp.(config.loop{i}).mu;
-             B_alpha{i} = solve_chol(A_K_MN_NM_chol{i},statistics1') * MU(config.order+1:end)';
+            B_alpha{i} = solve_chol(A_K_MN_NM_chol{i},statistics1') * (MU(config.order+1:end)'- (opt_params.MEAN_MAP * X)');
         else
             B_alpha{i} = solve_chol(A_K_MN_NM_chol{i},statistics1') * y(:,config.order + 1:end)';
         end%if

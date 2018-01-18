@@ -101,7 +101,20 @@ y_ref = y(:,501:end);
 X = X(:,1:500);
 y = y(:,1:500);
 
-end
+elseif strcmp(data_set,'cascaded')
+%%%%%%%%%%%%%%%%%%%%%%%%%
+% data from mattos dissertation, cascaded
+%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+cd data_raw
+load cascaded.mat
+cd ..
+X_ref = X(:,1025:end);
+y_ref = y(:,1025:end);
+X = X(:,1:1024);
+y = y(:,1:1024);
+
+end%if
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
