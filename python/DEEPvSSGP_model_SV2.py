@@ -3,12 +3,12 @@
 import sys; sys.path.insert(0, "../Theano"); sys.path.insert(0, "../../Theano")
 import theano; import theano.tensor as T; import theano.sandbox.linalg as sT
 import numpy as np
-import cPickle
+import pickle
 
 print('Theano version: ' + theano.__version__ + ', base compile dir: ' + theano.config.base_compiledir)
 theano.config.mode = 'FAST_RUN'
 theano.config.optimizer = 'fast_run'
-theano.config.exception_verbosity = 'low'
+theano.config.exception_verbosity = 'high'
 theano.config.reoptimize_unpickled_function = True
 
 class DEEPvSSGP:
@@ -16,7 +16,7 @@ class DEEPvSSGP:
         try:
             print('Trying to load model...')
             with open('model_SV2.save', 'rb') as file_handle:
-                self.f, self.g = cPickle.load(file_handle)
+                self.f, self.g = pickle.load(file_handle)
                 print('Loaded!')
             return
         except:
@@ -24,41 +24,37 @@ class DEEPvSSGP:
 
         print('Setting up variables...')
         hyp, S, MU, SIGMA, U, b = T.dmatrices('hyp', 'S', 'MU', 'SIGMA', 'U', 'b')
+        y, MEAN_MAP, sn, sf = T.dvectors('y','MEAN_MAP','sn','sf')
         if Q > 1:
             X = T.dmatrix('X')
         else:
             X = T.dvector('X')     
         if layers > 1:
-    			MU, SIGMA = T.dmatrices('MU', 'SIGMA')
+            MU, SIGMA = T.dmatrices('MU', 'SIGMA')
         else:
-    			MU, SIGMA = T.dvectors('MU', 'SIGMA')
-        y = T.dvector('y')
-        sn = T.dvector('sn')
-        sf = T.dvector('sf')
+            MU, SIGMA = T.dvectors('MU', 'SIGMA')
                     
         SIGMA_trf = T.log(1+T.exp(SIGMA))**2       
-
         sf_trf, sn_trf, lengthscale_trf, lengthscale_p_trf  =  T.log(1 + T.exp(sf))**2, T.log(1 + T.exp(sn))**2, T.log(1 + T.exp(hyp[:,0])), T.log(1 + T.exp(hyp[:,1]))
         
         print('Setting up model...')
-        LL, KL = self.get_model(lengthscale_trf, lengthscale_p_trf, sn_trf, sf_trf, S, MU, SIGMA_trf, U, b, X, y, Q, D, D_cum_sum, layers, order, non_rec, N, M)
+        LL, KL = self.get_model(lengthscale_trf, lengthscale_p_trf, sn_trf, sf_trf, S, MU, SIGMA_trf, U, b, X, y, MEAN_MAP, Q, D, D_cum_sum, layers, order, non_rec, N, M)
 
         print('Compiling model...')
         
-        inputs = {'X': X, 'MU': MU, 'SIGMA': SIGMA, 'S': S, 'U':  U, 'b':  b, 'hyp': hyp, 'y': y, 'sn': sn, 'sf': sf}
+        inputs = {'X': X, 'MU': MU, 'SIGMA': SIGMA, 'S': S, 'U':  U, 'b':  b, 'hyp': hyp, 'y': y, 'MEAN_MAP': MEAN_MAP, 'sn': sn, 'sf': sf}
         z = 0.0 * sum([T.sum(v) for v in inputs.values()]) # solve a bug with derivative wrt inputs not in the graph
-        f = zip(['LL', 'KL'],[LL, KL])
-        self.f = {fn: theano.function(inputs.values(), fv+z, name=fn, on_unused_input='ignore') for fn,fv in f}
-                  
-        g = zip(['LL', 'KL'],[LL, KL])
-        wrt = {'MU': MU, 'SIGMA': SIGMA, 'S':  S, 'U':  U, 'b':  b, 'hyp': hyp, 'sn': sn, 'sf': sf}
-        self.g = {vn: {gn: theano.function(inputs.values(), T.grad(gv+z, vv), name='d'+gn+'_d'+vn,
-            on_unused_input='ignore') for gn,gv in g} for vn, vv in wrt.iteritems()}
+        f = {'LL': LL, 'KL': KL}
+        self.f = {fn: theano.function(list(inputs.values()), fv+z, name=fn, on_unused_input='ignore') for fn,fv in f.items()}       
+        
+        g = {'LL': LL, 'KL': KL}
+        wrt = {'MU': MU, 'SIGMA': SIGMA, 'S':  S, 'U':  U, 'b':  b, 'hyp': hyp, 'MEAN_MAP': MEAN_MAP, 'sn': sn, 'sf': sf}
+        self.g = {vn: {gn: theano.function(list(inputs.values()), T.grad(gv+z, vv), name='d'+gn+'_d'+vn, on_unused_input='ignore') for gn,gv in g.items()} for vn, vv in wrt.items()}
 
         with open('model_SV2.save', 'wb') as file_handle:
             print('Saving model...')
             sys.setrecursionlimit(10000)
-            cPickle.dump([self.f, self.g], file_handle, protocol=cPickle.HIGHEST_PROTOCOL)
+            pickle.dump([self.f, self.g], file_handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     def get_EPhi(self, lengthscale_trf, lengthscale_p_trf, sf_trf, S, MU, SIGMA_trf, U, b, N, M): 
         
@@ -160,7 +156,7 @@ class DEEPvSSGP:
                                
         return X_inputs, SIGMA_inputs
 
-    def get_model(self, lengthscale_trf, lengthscale_p_trf, sn_trf, sf_trf, S, MU, SIGMA_trf, U, b, X, y, Q, D, D_cum_sum, layers, order, non_rec, N, M):
+    def get_model(self, lengthscale_trf, lengthscale_p_trf, sn_trf, sf_trf, S, MU, SIGMA_trf, U, b, X, y, MEAN_MAP, Q, D, D_cum_sum, layers, order, non_rec, N, M):
         
         X_inputs,SIGMA_inputs = self.update(layers, order, MU, SIGMA_trf, X, Q, D, D_cum_sum, N, non_rec)
         LL = 0
@@ -172,10 +168,10 @@ class DEEPvSSGP:
                 SIGMA_trf_LL = 0
             else:
                 if layers > 1:
-                    z = MU[order:,i]
+                    z = MU[order:,i] - X.dot(MEAN_MAP)
                     SIGMA_trf_LL = SIGMA_trf[order:,i]
                 else:
-                    z = MU[order:]
+                    z = MU[order:] - X.dot(MEAN_MAP)
                     SIGMA_trf_LL = SIGMA_trf[order:]
             zT_EPhi = z.T.dot(EPhi)
             opt_A_mean, cholSigInv = self.get_opt_A(sn_trf[i], EPhiTPhi, zT_EPhi)

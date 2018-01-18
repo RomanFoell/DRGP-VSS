@@ -16,7 +16,7 @@ from time import gmtime, strftime
 strftime("%Y-%m-%d %H:%M:%S", gmtime())
 
 os.chdir('data')
-mat = sio.loadmat('drive100_2_10.mat', squeeze_me=True) # specify filename to load
+mat = sio.loadmat('load_python.mat', squeeze_me=True) # specify filename to load
 os.chdir(owd)
 
 non_rec = 0 # choose 1, if your setting in matlab was non_rec = 'on'; otherwise 0
@@ -51,7 +51,7 @@ D = np.require(D,dtype=None,requirements='A')
 layers = np.require(layers,dtype=None,requirements='A')
 order = np.require(order,dtype=None,requirements='A')
 
-Q = X.ndim # input data dimension
+Q = X.ndim # NARX input data dimension
 N = np.int64(X.shape[0]) # amount of structured data (N hat)
 M = np.int64(S.shape[0]) # sparse parameter
 D = np.array(D,dtype='int64')
@@ -64,7 +64,7 @@ for i in range(0, layers + 1):
 D_cum_sum = np.array(D_cum_sum,dtype='int64')
 
 D_sum = D.sum()
-# S = np.random.normal(0, 1,(M,D_sum))
+S = np.random.normal(0, 1,(M,D_sum))
 # U = np.zeros((M,D_sum))
 # U = np.random.normal(0, 1,(M,D_sum))
 
@@ -72,11 +72,16 @@ hyp = np.zeros((D_sum,2))
 hyp[:,0] = lengthscale
 hyp[:,1] = lengthscale_p
 
-lower_bound_values = 0 # show lower bound value for every iteration, less fast
+# K = (X.T).dot(X)
+# E,V = np.linalg.eig(K)
+# MEAN_MAP = V[:,np.argmax(E)]
+MEAN_MAP = np.zeros((X.shape[1],))
+
+lower_bound_values = 1 # show lower bound value for every iteration, less fast
 save_iter = 0 # save opt_params every iteration (outcome in \DRGP_VSS\python\...)
 
 opt_params = {'hyp': hyp, 'S': S, 'MU': MU, 'SIGMA': SIGMA} # optimized parameters
-fixed_params = {'b': b, 'sn': sn, 'sf': sf, 'U': U} # other not optimized parameters
+fixed_params = {'MEAN_MAP': MEAN_MAP, 'b': b, 'sn': sn, 'sf': sf, 'U': U} # other not optimized parameters
 inputs = {'X': X, 'y': y} # input and output data
 DEEPvSSGP_opt1 = DEEPvSSGP_opt(Q, D, layers, order, D_cum_sum, N, M, non_rec, lower_bound_values, save_iter, inputs, opt_params, fixed_params)
 
@@ -84,17 +89,17 @@ DEEPvSSGP_opt1 = DEEPvSSGP_opt(Q, D, layers, order, D_cum_sum, N, M, non_rec, lo
 x0 = np.concatenate([np.atleast_2d(opt_params[n]).flatten() for n in DEEPvSSGP_opt1.opt_param_names])
 DEEPvSSGP_opt1.callback(x0)
 res = minimize(DEEPvSSGP_opt1.func, x0, method='L-BFGS-B', jac=DEEPvSSGP_opt1.fprime,
-        options={'ftol': 0, 'disp': False, 'maxiter': 70}, tol=0, callback=DEEPvSSGP_opt1.callback)
+        options={'ftol': 0, 'disp': False, 'maxiter': 50}, tol=0, callback=DEEPvSSGP_opt1.callback)
 
-opt_param_names = [n for n,_ in opt_params.iteritems()]
+opt_param_names = [n for n,_ in opt_params.items()]
 opt_param_values = [np.atleast_2d(opt_params[n]) for n in opt_param_names]
 shapes = [v.shape for v in opt_param_values]
-sizes = [sum([np.prod(x) for x in shapes[:i]]) for i in xrange(len(shapes)+1)]
-x_param_values = [res.x[sizes[i-1]:sizes[i]].reshape(shapes[i-1]) for i in xrange(1,len(shapes)+1)]
+sizes = [sum([np.prod(x) for x in shapes[:i]]) for i in range(len(shapes)+1)]
+x_param_values = [res.x[sizes[i-1]:sizes[i]].reshape(shapes[i-1]) for i in range(1,len(shapes)+1)]
 opt_params = {n:v for (n,v) in zip(opt_param_names, x_param_values)}
 opt_params1 = opt_params
 
 opt_params1.update(fixed_params)
 
 os.chdir("..")
-sio.savemat('matlab/data_optimized/DRGP_SS_drive.mat', {'opt_params': opt_params1})
+sio.savemat('matlab/data_optimized/test_SV2.mat', {'opt_params': opt_params1})

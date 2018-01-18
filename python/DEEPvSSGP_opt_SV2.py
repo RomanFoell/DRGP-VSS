@@ -2,7 +2,12 @@ import numpy as np
 from DEEPvSSGP_model_SV2 import DEEPvSSGP
 import scipy.io as sio
 def extend(x, y, z = {}):
-    return dict(x.items() + y.items() + z.items())
+    dictx=dict(x.items())
+    dicty=dict(y.items())
+    dictz=dict(z.items())
+    dictx.update(dicty)
+    dictx.update(dictz)
+    return dictx
 pool, global_f, global_g = None, None, None
 def eval_f_LL(MU, X, params):
     return global_f['LL'](**extend({'X': X}, params))
@@ -13,14 +18,14 @@ class DEEPvSSGP_opt():
     def __init__(self, Q, D, layers, order, D_cum_sum, N, M, non_rec, lower_bound_values, save_iter, inputs, opt_params, fixed_params):
         self.deepvssgp, self.D_cum_sum, self.N, self.M, self.fixed_params, self.lower_bound_values, self.save_iter  = DEEPvSSGP(Q, D, layers, order, D_cum_sum, N, M, non_rec), D_cum_sum, N, M, fixed_params, lower_bound_values, save_iter
         self.inputs = inputs
-        self.opt_param_names = [n for n,_ in opt_params.iteritems()]
+        self.opt_param_names = [n for n,_ in opt_params.items()]
         opt_param_values = [np.atleast_2d(opt_params[n]) for n in self.opt_param_names]
         self.shapes = [v.shape for v in opt_param_values]
-        self.sizes = [sum([np.prod(x) for x in self.shapes[:i]]) for i in xrange(len(self.shapes)+1)]
+        self.sizes = [sum([np.prod(x) for x in self.shapes[:i]]) for i in range(len(self.shapes)+1)]
         self.callback_counter = [0]
 
     def unpack(self, x):
-        x_param_values = [np.squeeze(x[self.sizes[i-1]:self.sizes[i]].reshape(self.shapes[i-1])) for i in xrange(1,len(self.shapes)+1)]
+        x_param_values = [np.squeeze(x[self.sizes[i-1]:self.sizes[i]].reshape(self.shapes[i-1])) for i in range(1,len(self.shapes)+1)]
         params = {n:v for (n,v) in zip(self.opt_param_names, x_param_values)}
         return params
 
