@@ -1,8 +1,8 @@
 # In the most cases it is enough to train ones with fixed sn and sf (b were assumed to be always fixed)
 # and optional S, U depending on the data-set with about 50 to 100 iterations
 
-owd = 'C:/Users/flo9fe/Desktop/GIT_DRGP_VSS/python'
-#owd = '/usr/local/home/foellrn/GIT_DRGP_VSS/python'
+owd = 'C:/Users/flo9fe/Desktop/GIT/python'
+#owd = '/usr/local/home/GIT/python'
 
 import os;
 os.chdir(owd)
@@ -11,12 +11,14 @@ from scipy.optimize import minimize
 import scipy.io as sio
 import numpy as np
 np.set_printoptions(precision=2, suppress=True)
-from time import gmtime, strftime
+from time import gmtime, strftime, time
 
 strftime("%Y-%m-%d %H:%M:%S", gmtime())
 
 os.chdir('data')
-mat = sio.loadmat('load_python.mat', squeeze_me=True) # specify filename to load
+dataset = 'load_python'
+run = input('Enter something: ')
+mat = sio.loadmat(dataset + '.mat', squeeze_me=True) # specify filename to load
 os.chdir(owd)
 
 non_rec = 0 # choose 1, if your setting in matlab was non_rec = 'on'; otherwise 0
@@ -83,13 +85,14 @@ save_iter = 0 # save opt_params every iteration (outcome in \DRGP_VSS\python\...
 opt_params = {'hyp': hyp, 'S': S, 'MU': MU, 'SIGMA': SIGMA} # optimized parameters
 fixed_params = {'MEAN_MAP': MEAN_MAP, 'b': b, 'sn': sn, 'sf': sf, 'U': U} # other not optimized parameters
 inputs = {'X': X, 'y': y} # input and output data
-DEEPvSSGP_opt1 = DEEPvSSGP_opt(Q, D, layers, order, D_cum_sum, N, M, non_rec, lower_bound_values, save_iter, inputs, opt_params, fixed_params)
+DEEPvSSGP_opt1 = DEEPvSSGP_opt(dataset, run, Q, D, layers, order, D_cum_sum, N, M, non_rec, lower_bound_values, save_iter, inputs, opt_params, fixed_params)
 
 # LBFGS
 x0 = np.concatenate([np.atleast_2d(opt_params[n]).flatten() for n in DEEPvSSGP_opt1.opt_param_names])
 DEEPvSSGP_opt1.callback(x0)
+startTime = time()
 res = minimize(DEEPvSSGP_opt1.func, x0, method='L-BFGS-B', jac=DEEPvSSGP_opt1.fprime,
-        options={'ftol': 0, 'disp': False, 'maxiter': 50}, tol=0, callback=DEEPvSSGP_opt1.callback)
+        options={'ftol': 0, 'disp': False, 'maxiter': 2}, tol=0, callback=DEEPvSSGP_opt1.callback)
 
 opt_param_names = [n for n,_ in opt_params.items()]
 opt_param_values = [np.atleast_2d(opt_params[n]) for n in opt_param_names]
@@ -102,4 +105,7 @@ opt_params1 = opt_params
 opt_params1.update(fixed_params)
 
 os.chdir("..")
-sio.savemat('matlab/data_optimized/test_SV2.mat', {'opt_params': opt_params1})
+sio.savemat('matlab/data_optimized/' + 'SV2_' + dataset + run, {'opt_params': opt_params1})
+
+endTime = time()
+print('Running Time: '+str(endTime-startTime))

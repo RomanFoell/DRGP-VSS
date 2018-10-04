@@ -15,7 +15,9 @@ def eval_g_LL(name, MU, X, params):
     return global_g[name]['LL'](**extend({'X': X}, params))
 
 class DEEPvSSGP_opt():
-    def __init__(self, Q, D, layers, order, D_cum_sum, N, M, non_rec, lower_bound_values, save_iter, inputs, opt_params, fixed_params):
+    def __init__(self, dataset, run, Q, D, layers, order, D_cum_sum, N, M, non_rec, lower_bound_values, save_iter, inputs, opt_params, fixed_params):
+        self.dataset = dataset
+        self.run = run
         self.deepvssgp, self.D_cum_sum, self.N, self.M, self.fixed_params, self.lower_bound_values, self.save_iter  = DEEPvSSGP(Q, D, layers, order, D_cum_sum, N, M, non_rec), D_cum_sum, N, M, fixed_params, lower_bound_values, save_iter
         self.inputs = inputs
         self.opt_param_names = [n for n,_ in opt_params.items()]
@@ -49,17 +51,18 @@ class DEEPvSSGP_opt():
         if self.lower_bound_values == 1:  
             LL = self.deepvssgp.f['LL'](**params)
             KL = self.deepvssgp.f['KL'](**params)
-            print(str(self.callback_counter) + ':' + str(-(LL - KL)))
+            print(str(self.callback_counter) + '::' + str(-(LL - KL)))
+
             if self.save_iter == 1:
-                sio.savemat('temp_SV2_' + str(self.callback_counter) + '.mat', {'opt_params': params, 'bound': str(-(LL - KL))})
+                sio.savemat('temp_SV2_'  + self.dataset + self.run + str(self.callback_counter) + '.mat', {'opt_params': params, 'bound': str(-(LL - KL))})
             else:
-                sio.savemat('temp_SV2.mat', {'opt_params': params})
+                sio.savemat('temp_SV2' + self.dataset + self.run + '.mat', {'opt_params': params})
         else:
             print(str(self.callback_counter))
             if self.save_iter == 1:
-                sio.savemat('temp_SV2_' + str(self.callback_counter) + '.mat', {'opt_params': params})
+                sio.savemat('temp_SV2_'  + self.dataset + self.run + str(self.callback_counter) + '.mat', {'opt_params': params})
             else:
-                sio.savemat('temp_SV2.mat', {'opt_params': params})
+                sio.savemat('temp_SV2' + self.dataset + self.run + '.mat', {'opt_params': params})
         self.callback_counter[0] += 1
         x = np.concatenate([np.atleast_2d(opt_params[n]).flatten() for n in self.opt_param_names])       
         return x
