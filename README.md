@@ -1,3 +1,4 @@
+# DRGP-(V)SS(-IP)
 (licenced under MIT licence)
 
 We seperated the code into two parts for the model cases DRGP-(V)SS and DRGP-(V)SS-IP.
