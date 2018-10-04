@@ -26,6 +26,7 @@ hold on
 plot(1:time_steps,y_ref_plot,'b','DisplayName','real data');
 hold on
 plot(1:time_steps,y_plot,'k','DisplayName','simulation');
+legend('show')
 
 color_order = [0         0.4470    0.7410
                    0.8500    0.3250    0.0980
