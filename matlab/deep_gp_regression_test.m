@@ -1,4 +1,4 @@
-function [y_test,V_test] = deep_gp_regression_test(X_test,B,config)
+function [y_test,lambda_test,V_test] = deep_gp_regression_test(X_test,B,config)
 
 n_test = 1;
 D_temp = config.D;
@@ -12,8 +12,9 @@ k_config.nX = n_test;
 k_config.mm = config.mm;
 k_config.readed_kernels = config.readed_kernels;
 
-y_test = cell(config.layers + 1,config.n_ref + 1);
-V_test = cell(config.layers + 1,config.n_ref + 1);
+y_test = cell(config.layers + 1,config.n_ref);
+lambda_test = cell(config.layers + 1,config.n_ref);
+V_test = cell(config.layers + 1,config.n_ref);
 
 % init first point
 X_simu = cell(config.layers + 1,1);
@@ -47,11 +48,12 @@ for i = 1:config.layers + 1
         statistics2_test = feval(config.kernel_fun_statistics2,S_hat,X_simu{i},SIGMA_inputs_quad,Y_M_temp,k_config);
     end%if
     B_alpha = B.alpha{i};
-    B_trace = B.trace{i};  
+    B_trace = B.trace{i};
     
     % test values
     y_test{i} = statistics1_test * B_alpha;
-    V_test{i} = B_alpha' * (statistics2_test - statistics1_test' * statistics1_test) * B_alpha + sum(sum(B_trace .* statistics2_test)) + snquad;
+    lambda_test{i} = B_alpha' * (statistics2_test - statistics1_test' * statistics1_test) * B_alpha + snquad;
+    V_test{i} = lambda_test{i} + sum(sum(B_trace .* statistics2_test));
         
     if i < config.layers
         X_simu{i + 1} = [y_test{i,1};fliplr(config.hyp.(strcat('layer',num2str(i))).mu(end - config.order + 1:end - 1))';fliplr(config.hyp.(strcat('layer',num2str(i + 1))).mu(end - config.order + 1:end))']';
@@ -95,11 +97,12 @@ for k = 2:config.n_ref
             statistics2_test = feval(config.kernel_fun_statistics2,S_hat,X_simu{i},SIGMA_inputs_quad,Y_M_temp,k_config);
         end%if
         B_alpha = B.alpha{i};
-        B_trace = B.trace{i}; 
+        B_trace = B.trace{i};
         
         % test values
         y_test{i,k} = statistics1_test * B_alpha;
-        V_test{i,k} = B_alpha' * (statistics2_test - statistics1_test' * statistics1_test) * B_alpha + sum(sum(B_trace .* statistics2_test)) + snquad;
+        lambda_test{i,k} = B_alpha' * (statistics2_test - statistics1_test' * statistics1_test) * B_alpha  + snquad;
+        V_test{i,k} = lambda_test{i,k} + sum(sum(B_trace .* statistics2_test));
 
         if i < config.layers
             X_simu{i + 1} = [y_test{i,k}' X_simu{i + 1}(1:config.order - 1) X_simu{i + 2}(1:config.order)];
