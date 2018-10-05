@@ -96,7 +96,7 @@ x0 = np.concatenate([np.atleast_2d(opt_params[n]).flatten() for n in DEEPvSSGP_o
 DEEPvSSGP_opt1.callback(x0)
 startTime = time()
 res = minimize(DEEPvSSGP_opt1.func, x0, method='L-BFGS-B', jac=DEEPvSSGP_opt1.fprime,
-        options={'ftol': 0, 'disp': False, 'maxiter': 2}, tol=0, callback=DEEPvSSGP_opt1.callback)
+        options={'ftol': 0, 'disp': False, 'maxiter': 66}, tol=0, callback=DEEPvSSGP_opt1.callback)
 
 opt_param_names = [n for n,_ in opt_params.items()]
 opt_param_values = [np.atleast_2d(opt_params[n]) for n in opt_param_names]
