@@ -3,7 +3,7 @@
 
 We seperated the code into two parts for the model cases DRGP-(V)SS and DRGP-(V)SS-IP.
 DRGP-(V)SS belongs to the folders: python, matlab;
-DRGP-(V)SS-IP belongs to the folders: python_ip, matlab_ip folder. (will be uploaded soon)
+DRGP-(V)SS-IP belongs to the folders: python_ip, matlab_ip folder.
 
 In the following we describe the stages for initialization, optimization/training and testing/simulation for the DRGP-(V)SS cases.
 The DRGP-(V)SS-IP cases are fully analog with respect to the different folder names python_ip, matlab_ip.
