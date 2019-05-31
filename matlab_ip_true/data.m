@@ -116,7 +116,7 @@ y = y(:,1:1024);
 
 elseif strcmp(data_set,'sarco')
 %%%%%%%%%%%%%%%%%%%%%%%%%
-% data from Andreas Dörr, sarco
+% data sarco, rasmussen
 %%%%%%%%%%%%%%%%%%%%%%%%%
     
 cd data_raw
