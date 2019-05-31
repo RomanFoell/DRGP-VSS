@@ -114,6 +114,24 @@ y_ref = y(:,1025:end);
 X = X(:,1:1024);
 y = y(:,1:1024);
 
+elseif strcmp(data_set,'sarco')
+%%%%%%%%%%%%%%%%%%%%%%%%%
+% data sarco, rasmussen
+%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+cd data_raw
+load sarcos_inv.mat
+cd ..
+% X = sarcos_inv(26000:28000,22:end)';
+X = [sarcos_inv(26000:28000,22:end)';sarcos_inv(26000:28000,1)'];
+y = sarcos_inv(26000:28000,1)';
+cd data_raw
+load sarcos_inv_test.mat
+cd ..
+% X_ref = sarcos_inv_test(2600:3500,22:end)';
+X_ref = [sarcos_inv_test(2600:3500,22:end)';sarcos_inv_test(2599:3499,1)'];
+y_ref = sarcos_inv_test(2600:3500,1)';
+
 end%if
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
