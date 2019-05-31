@@ -1,12 +1,13 @@
 # DRGP-(V)SS(-IP)
 (licenced under MIT licence)
 
-We seperated the code into two parts for the model cases DRGP-(V)SS and DRGP-(V)SS-IP.
+We seperated the code into three parts for the model cases DRGP-(V)SS, DRGP-(V)SS-IP-1 and DRGP-(V)SS-IP-2.
 DRGP-(V)SS belongs to the folders: python, matlab;
-DRGP-(V)SS-IP belongs to the folders: python_ip, matlab_ip folder.
+DRGP-(V)SS-IP-1 belongs to the folders: python_ip_true, matlab_ip_true folder.
+DRGP-(V)SS-IP-2 belongs to the folders: python_ip, matlab_ip folder.
 
 In the following we describe the stages for initialization, optimization/training and testing/simulation for the DRGP-(V)SS cases.
-The DRGP-(V)SS-IP cases are fully analog with respect to the different folder names python_ip, matlab_ip.
+The DRGP-(V)SS-IP-1/2 cases are fully analog with respect to the different folder names python_ip, matlab_ip.
 
 The initialization, optimization/training and testing/simulation code is split into three parts:
 
@@ -35,6 +36,16 @@ Steps to go:
    
 We also offer some of our achieved results in \DRGP-VSS\matlab\data_optimized.
 The raw data is available in \DRGP-VSS\matlab\data_raw.
+
+New:
+
+We further added the Latent variable model (LVM) for data-dimensionality reduction with our GP approximations (V)SS, (V)SS-IP-1 and (V)SS-IP-2.
+The files can be found in python, python_ip and python_ip_true.
+We added two data-sets in python...\data: data_usps.mat and data_oil.mat.
+They consist of the initialization of our model parameters and the PCA initialization of the data.
+
+---------------
+---------------
 
 Our code relies on some code snippets of VSSGP (https://github.com/yaringal/VSSGP).
 This means we took just these parts of the code which brings our new algorithm/method to work with theano/python.
