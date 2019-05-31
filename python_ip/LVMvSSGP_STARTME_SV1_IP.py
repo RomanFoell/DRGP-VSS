@@ -2,6 +2,7 @@
 # and optional S, U depending on the data-set with about 50 to 100 iterations
 
 owd = 'C:/Users/flo9fe/Desktop/GIT_IP/python_ip'
+#owd = '/usr/local/home/GIT_IP/python_ip'
 
 import os;
 os.chdir(owd)
